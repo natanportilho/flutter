@@ -837,8 +837,12 @@ abstract class FlutterCommand extends Command<void> {
       if (deviceManager.hasSpecifiedDeviceId) {
        globals.printStatus(userMessages.flutterFoundSpecifiedDevices(devices.length, deviceManager.specifiedDeviceId));
       } else {
-        globals.printStatus(userMessages.flutterSpecifyDeviceWithAllOption);
-        devices = await deviceManager.getAllConnectedDevices();
+        globals.printStatus(userMessages.flutterMultipleDevicesFound);
+        final Device chosenDevice = _chooseOneOfAvailableDevices(devices);
+        if (chosenDevice != null) {
+          deviceManager.specifiedDeviceId = chosenDevice.id;
+          devices = [chosenDevice];
+        }
       }
       globals.printStatus('');
       await Device.printDevices(devices);
