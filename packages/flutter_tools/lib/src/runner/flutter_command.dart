@@ -872,18 +872,10 @@ abstract class FlutterCommand extends Command<void> {
   String _readUserInput() => stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
 
   bool _isValidDeviceOption(String option, int devicesLength) {
-    final int optionNumber = int.parse(option);
-    return _isNumeric(option) &&
-            optionNumber < devicesLength - 1 &&
-            optionNumber > 0;
-  }
-
-
-  bool _isNumeric(String str) {
-    if (str == null) {
-      return false;
-    }
-    return double.tryParse(str) != null;
+    final int optionNumber = int.tryParse(option);
+    return optionNumber != null
+           && optionNumber < devicesLength - 1
+           && optionNumber > 0;
   }
 
   /// Find and return the target [Device] based upon currently connected
