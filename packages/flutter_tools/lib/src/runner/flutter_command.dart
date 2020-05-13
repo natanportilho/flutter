@@ -844,9 +844,6 @@ abstract class FlutterCommand extends Command<void> {
           devices = <Device>[chosenDevice];
         }
       }
-      globals.printStatus('');
-      await Device.printDevices(devices);
-      return null;
     }
     return devices;
   }
