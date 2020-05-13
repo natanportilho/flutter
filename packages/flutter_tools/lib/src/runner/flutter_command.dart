@@ -841,7 +841,7 @@ abstract class FlutterCommand extends Command<void> {
         final Device chosenDevice = _chooseOneOfAvailableDevices(devices);
         if (chosenDevice != null) {
           deviceManager.specifiedDeviceId = chosenDevice.id;
-          devices = [chosenDevice];
+          devices = <Device>[chosenDevice];
         }
       }
       globals.printStatus('');
