@@ -3,6 +3,8 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
@@ -843,6 +845,41 @@ abstract class FlutterCommand extends Command<void> {
       return null;
     }
     return devices;
+  }
+
+  Device _chooseOneOfAvailableDevices(List<Device> devices) {
+    _displayDeviceOptions(devices);
+    final String userInput = _readUserInput();
+    if (_isValidDeviceOption(userInput, devices.length)) {
+      return devices[int.parse(userInput.toString())];
+    }
+    return null;
+  }
+
+  void _displayDeviceOptions(List<Device> devices) {
+    int count = 0;
+    for (final Device device in devices) {
+      globals.printStatus(
+      userMessages.flutterChooseDevice(count, device.id, device.name));
+      count++;
+    }
+  }
+
+  String _readUserInput() => stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
+
+  bool _isValidDeviceOption(String option, int devicesLength) {
+    final int optionNumber = int.parse(option);
+    return _isNumeric(option) &&
+            optionNumber < devicesLength - 1 &&
+            optionNumber > 0;
+  }
+
+
+  bool _isNumeric(String str) {
+    if (str == null) {
+      return false;
+    }
+    return double.tryParse(str) != null;
   }
 
   /// Find and return the target [Device] based upon currently connected
