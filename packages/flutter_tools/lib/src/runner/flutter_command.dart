@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:file/file.dart';
@@ -443,7 +445,6 @@ abstract class FlutterCommand extends Command<void> {
       defaultsTo: enabledByDefault
         ?? kIconTreeShakerEnabledDefault,
       help: 'Tree shake icon fonts so that only glyphs used by the application remain.',
-      hide: true,
     );
   }
 
@@ -832,7 +833,13 @@ abstract class FlutterCommand extends Command<void> {
     } else if (devices.length > 1 && !deviceManager.hasSpecifiedAllDevices) {
       if (deviceManager.hasSpecifiedDeviceId) {
        globals.printStatus(userMessages.flutterFoundSpecifiedDevices(devices.length, deviceManager.specifiedDeviceId));
+      } else {
+        globals.printStatus(userMessages.flutterSpecifyDeviceWithAllOption);
+        devices = await deviceManager.getAllConnectedDevices();
       }
+      globals.printStatus('');
+      await Device.printDevices(devices);
+      return null;
     }
     return devices;
   }
