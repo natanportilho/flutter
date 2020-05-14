@@ -877,6 +877,7 @@ abstract class FlutterCommand extends Command<void> {
         logger: globals.logger,
         prompt: userMessages.flutterChoseOne
       );
+      return result;
     }
     return null;
   }
@@ -888,8 +889,8 @@ abstract class FlutterCommand extends Command<void> {
 
     final int optionNumber = int.tryParse(option);
     return optionNumber != null
-           && optionNumber < devicesLength - 1
-           && optionNumber > 0;
+           && optionNumber <= devicesLength - 1
+           && optionNumber >= 0;
   }
 
   /// Find and return the target [Device] based upon currently connected
