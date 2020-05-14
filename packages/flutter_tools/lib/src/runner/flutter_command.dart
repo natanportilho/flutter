@@ -2,10 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:file/file.dart';
@@ -838,7 +834,7 @@ abstract class FlutterCommand extends Command<void> {
        globals.printStatus(userMessages.flutterFoundSpecifiedDevices(devices.length, deviceManager.specifiedDeviceId));
       } else {
         globals.printStatus(userMessages.flutterMultipleDevicesFound);
-        final Device chosenDevice = _chooseOneOfAvailableDevices(devices);
+        final Device chosenDevice = await _chooseOneOfAvailableDevices(devices);
         if (chosenDevice != null) {
           deviceManager.specifiedDeviceId = chosenDevice.id;
           devices = <Device>[chosenDevice];
@@ -848,9 +844,9 @@ abstract class FlutterCommand extends Command<void> {
     return devices;
   }
 
-  Device _chooseOneOfAvailableDevices(List<Device> devices) {
+  Future<Device> _chooseOneOfAvailableDevices(List<Device> devices) async{
     _displayDeviceOptions(devices);
-    final String userInput = _readUserInput();
+    final String userInput =  await _readUserInput();
     if (_isValidDeviceOption(userInput, devices.length)) {
       return devices[int.parse(userInput.toString())];
     }
@@ -860,15 +856,36 @@ abstract class FlutterCommand extends Command<void> {
   void _displayDeviceOptions(List<Device> devices) {
     int count = 0;
     for (final Device device in devices) {
-      globals.printStatus(
-      userMessages.flutterChooseDevice(count, device.id, device.name));
+      globals.printStatus(userMessages.flutterChooseDevice(count, device.id, device.name));
       count++;
     }
   }
 
-  String _readUserInput() => stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
+  List<String> _createList(int length){
+    final List<String> possibleValues = <String>[];
+    for (int i = 0; i < length; i++){
+      possibleValues.add(i.toString());
+    }
+    return possibleValues;
+  }
+
+  Future<String> _readUserInput() async{
+   if (globals.stdio.stdinHasTerminal)  {
+      globals.terminal.usesTerminalUi = true;
+      final String result = await globals.terminal.promptForCharInput(
+        _createList(2),
+        logger: globals.logger,
+        prompt: userMessages.flutterChoseOne
+      );
+    }
+    return null;
+  }
 
   bool _isValidDeviceOption(String option, int devicesLength) {
+    if (option == null){
+      return false;
+    }
+
     final int optionNumber = int.tryParse(option);
     return optionNumber != null
            && optionNumber < devicesLength - 1
