@@ -832,65 +832,9 @@ abstract class FlutterCommand extends Command<void> {
     } else if (devices.length > 1 && !deviceManager.hasSpecifiedAllDevices) {
       if (deviceManager.hasSpecifiedDeviceId) {
        globals.printStatus(userMessages.flutterFoundSpecifiedDevices(devices.length, deviceManager.specifiedDeviceId));
-      } else {
-        globals.printStatus(userMessages.flutterMultipleDevicesFound);
-        final Device chosenDevice = await _chooseOneOfAvailableDevices(devices);
-        if (chosenDevice != null) {
-          deviceManager.specifiedDeviceId = chosenDevice.id;
-          devices = <Device>[chosenDevice];
-        }
       }
     }
     return devices;
-  }
-
-  Future<Device> _chooseOneOfAvailableDevices(List<Device> devices) async {
-    _displayDeviceOptions(devices);
-    final String userInput =  await _readUserInput();
-    if (_isValidDeviceOption(userInput, devices.length)) {
-      return devices[int.parse(userInput.toString())];
-    }
-    return null;
-  }
-
-  void _displayDeviceOptions(List<Device> devices) {
-    int count = 0;
-    for (final Device device in devices) {
-      globals.printStatus(userMessages.flutterChooseDevice(count, device.id, device.name));
-      count++;
-    }
-  }
-
-  Future<String> _readUserInput() async {
-   if (globals.stdio.stdinHasTerminal)  {
-      globals.terminal.usesTerminalUi = true;
-      final String result = await globals.terminal.promptForCharInput(
-        _createListForPossibleInputs(2),
-        logger: globals.logger,
-        prompt: userMessages.flutterChoseOne
-      );
-      return result;
-    }
-    return null;
-  }
-
-  List<String> _createListForPossibleInputs(int length) {
-    final List<String> possibleValues = <String>[];
-    for (int i = 0; i < length; i++){
-      possibleValues.add(i.toString());
-    }
-    return possibleValues;
-  }
-
-  bool _isValidDeviceOption(String option, int devicesLength) {
-    if (option == null){
-      return false;
-    }
-
-    final int optionNumber = int.tryParse(option);
-    return optionNumber != null
-           && optionNumber <= devicesLength - 1
-           && optionNumber >= 0;
   }
 
   /// Find and return the target [Device] based upon currently connected
