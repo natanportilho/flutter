@@ -15,6 +15,7 @@ import 'artifacts.dart';
 import 'base/context.dart';
 import 'base/file_system.dart';
 import 'base/io.dart';
+import 'base/user_messages.dart';
 import 'base/utils.dart';
 import 'build_info.dart';
 import 'features.dart';
@@ -249,8 +250,51 @@ class DeviceManager {
             .where((Device device) => device.ephemeral == true)
             .toList();
       }
+      // If it was not able to prioritize a device. For xample, if the user
+      // has two active Android devices running, then we request the user to
+      // choose one.
+      if (devices.length > 1) {
+        final Device chosenDevice = await _chooseOneOfAvailableDevices(devices);
+        deviceManager.specifiedDeviceId = chosenDevice.id;
+        devices = <Device>[chosenDevice];
+      }
     }
     return devices;
+  }
+
+   Future<Device> _chooseOneOfAvailableDevices(List<Device> devices) async {
+    _displayDeviceOptions(devices);
+    final String userInput =  await _readUserInput(devices.length);
+    return devices[int.parse(userInput.toString())];
+  }
+
+  void _displayDeviceOptions(List<Device> devices) {
+    int count = 0;
+    for (final Device device in devices) {
+      globals.printStatus(userMessages.flutterChooseDevice(count, device.id, device.name));
+      count++;
+    }
+  }
+
+  Future<String> _readUserInput(int deviceLength) async {
+   if (globals.stdio.stdinHasTerminal)  {
+      globals.terminal.usesTerminalUi = true;
+      final String result = await globals.terminal.promptForCharInput(
+        _createPossibleInputsList(deviceLength),
+        logger: globals.logger,
+        prompt: userMessages.flutterChoseOne
+      );
+      return result;
+    }
+    return null;
+  }
+
+  List<String> _createPossibleInputsList(int length) {
+    final List<String> possibleInputs = <String>[];
+    for (int i = 0; i < length; i++){
+      possibleInputs.add(i.toString());
+    }
+    return possibleInputs;
   }
 
   /// Returns whether the device is supported for the project.
