@@ -844,7 +844,7 @@ abstract class FlutterCommand extends Command<void> {
     return devices;
   }
 
-  Future<Device> _chooseOneOfAvailableDevices(List<Device> devices) async{
+  Future<Device> _chooseOneOfAvailableDevices(List<Device> devices) async {
     _displayDeviceOptions(devices);
     final String userInput =  await _readUserInput();
     if (_isValidDeviceOption(userInput, devices.length)) {
@@ -861,25 +861,25 @@ abstract class FlutterCommand extends Command<void> {
     }
   }
 
-  List<String> _createList(int length){
-    final List<String> possibleValues = <String>[];
-    for (int i = 0; i < length; i++){
-      possibleValues.add(i.toString());
-    }
-    return possibleValues;
-  }
-
-  Future<String> _readUserInput() async{
+  Future<String> _readUserInput() async {
    if (globals.stdio.stdinHasTerminal)  {
       globals.terminal.usesTerminalUi = true;
       final String result = await globals.terminal.promptForCharInput(
-        _createList(2),
+        _createListForPossibleInputs(2),
         logger: globals.logger,
         prompt: userMessages.flutterChoseOne
       );
       return result;
     }
     return null;
+  }
+
+  List<String> _createListForPossibleInputs(int length) {
+    final List<String> possibleValues = <String>[];
+    for (int i = 0; i < length; i++){
+      possibleValues.add(i.toString());
+    }
+    return possibleValues;
   }
 
   bool _isValidDeviceOption(String option, int devicesLength) {
