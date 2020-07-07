@@ -20,6 +20,7 @@ class EmulatorsCommand extends FlutterCommand {
         negatable: false);
     argParser.addOption('name',
         help: 'Used with flag --create. Specifies a name for the emulator being created.');
+    argParser.addOption('coldboot', help: 'Coldboots Android emulator.');
   }
 
   @override
