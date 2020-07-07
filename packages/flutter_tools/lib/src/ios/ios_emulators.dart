@@ -66,6 +66,9 @@ class IOSEmulator extends Emulator {
     // devices to the foreground)
     await launchSimulator(<String>[]);
   }
+
+  @override
+  Future<void> coldboot() async {}
 }
 
 /// Return the list of iOS Simulators (there can only be zero or one).

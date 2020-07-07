@@ -269,6 +269,8 @@ abstract class Emulator {
 
   Future<void> launch();
 
+  Future<void> coldboot();
+
   @override
   String toString() => name;
 
